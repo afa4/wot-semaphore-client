@@ -1,0 +1,16 @@
+
+<div class="sidebar-wrapper">
+  <div class="logo" style="text-align: center;">
+    <div class="simple-text logo-normal">
+      SEMAPHORE
+    </div>
+  </div>
+    <ul class="nav">
+        <li *ngFor="let menuItem of menuItems" routerLinkActive="active" class="{{menuItem.class}}">
+            <a [routerLink]="[menuItem.path]">
+                <i class="nc-icon {{menuItem.icon}}"></i>
+                <p>{{menuItem.titleMenu}}</p>
+            </a>
+        </li>
+    </ul>
+</div>
