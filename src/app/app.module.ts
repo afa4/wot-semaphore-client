@@ -12,6 +12,7 @@ import { AppRoutes } from './app.routing';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import {SemaphoreService} from './semaphore.service';
 import { HttpClientModule } from '@angular/common/http';
+import {ChartsModule} from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { HttpClientModule } from '@angular/common/http';
     ToastrModule.forRoot(),
     FooterModule,
     HttpClientModule,
+    ChartsModule
   ],
   providers: [SemaphoreService],
   bootstrap: [AppComponent]

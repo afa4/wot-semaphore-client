@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import Chart from 'chart.js';
 import {SemaphoreService} from '../../semaphore.service';
 import {webSocket, WebSocketSubject} from 'rxjs/webSocket';
 import {message} from 'gulp-typescript/release/utils';
+import { BaseChartDirective } from 'ng2-charts';
 const subject = webSocket('ws://localhost:8888');
 export class Message {
   constructor(
@@ -29,8 +30,15 @@ export class DashboardComponent implements OnInit {
   public chartColor;
   public chartEmail;
   public chartHours;
-  private qtdCarros = 0;
-  private serverMessages: Array<Message>;
+  private fstSemaphore:number = 0;
+  private sndSemaphore:number = 0;
+  public pieChartLabels = ['First Semaphore Cars', 'Second Semaphore Cars'];
+  public pieChartData = [this.fstSemaphore, this.sndSemaphore];
+  public pieChartType = 'pie';
+  // @ts-ignore
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective;
+
+
 
   constructor (private service: SemaphoreService) {
   }
@@ -46,14 +54,14 @@ export class DashboardComponent implements OnInit {
         type: 'line',
 
         data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+          labels: ["Jan"],
           datasets: [{
               borderColor: "#6bd098",
               backgroundColor: "#6bd098",
               pointRadius: 0,
               pointHoverRadius: 0,
               borderWidth: 3,
-              data: [300, 310, 316, 322, 330, 326, 333, 345, 338, 354]
+              data: [300]
             },
             {
               borderColor: "#f17e5d",
@@ -61,7 +69,7 @@ export class DashboardComponent implements OnInit {
               pointRadius: 0,
               pointHoverRadius: 0,
               borderWidth: 3,
-              data: [320, 340, 365, 360, 370, 385, 390, 384, 408, 420]
+              data: [320]
             },
             {
               borderColor: "#fcc468",
@@ -69,7 +77,7 @@ export class DashboardComponent implements OnInit {
               pointRadius: 0,
               pointHoverRadius: 0,
               borderWidth: 3,
-              data: [370, 394, 415, 409, 425, 445, 460, 450, 478, 484]
+              data: [370]
             }
           ]
         },
@@ -238,9 +246,31 @@ export class DashboardComponent implements OnInit {
   connectWebSocket() {
     subject.subscribe(
       msg => {
-        console.log(msg)
-        this.qtdCarros++;
-      },
+        console.log(msg);
+        if (msg['semaphore'] === 'fst') {
+          if ( msg['carQtt'] != null) {
+            this.fstSemaphore++;
+            this.pieChartData[0] = this.fstSemaphore;
+          }
+        }
+        if (msg['semaphore'] === 'snd') {
+          if ( msg['carQtt'] != null) {
+            this.sndSemaphore++;
+            this.pieChartData[1] = this.sndSemaphore;
+          }
+        }
+        this.chart.chart.update();
+      }
+        // const topic  = msg['topic'].toString();
+        // if (topic  === 'wot-semaphore/fst/sonar') {
+        //   this.fstSemaphore++;
+        //   this.pieChartData[0] = this.fstSemaphore
+        // }
+        // if (topic  === 'wot-semaphore/snd/sonar') {
+        //   this.sndSemaphore++;
+        //   this.pieChartData[1] = this.sndSemaphore;
+        // }
+      ,
       err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       () => console.log('complete') // Called when connection is closed (for whatever reason).
     );
